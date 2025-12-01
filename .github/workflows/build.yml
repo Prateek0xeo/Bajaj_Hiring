@@ -1,11 +1,13 @@
-name: Build JAR
+name: Build and Release JAR
 
 on:
   push:
     branches: [ main, master ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:
 
 jobs:
   build:
@@ -32,8 +34,36 @@ jobs:
         path: target/hiring-challenge-1.0.0.jar
         retention-days: 7
     
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: latest
+        name: Latest Build
+        body: |
+          ## Bajaj Hiring Challenge - Spring Boot Application
+          
+          **Candidate**: Prateek Kumar  
+          **Reg No**: 22BCE2300  
+          **Email**: Prateekkumar2004@gmail.com
+          
+          ### Download
+          Click the JAR file below to download the compiled application.
+          
+          ### Run
+          ```bash
+          java -jar hiring-challenge-1.0.0.jar
+          ```
+          
+          ### Built with
+          - Spring Boot 2.7.18
+          - Java 8
+          - Maven
+        files: target/hiring-challenge-1.0.0.jar
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
     - name: Display build success
       run: |
         echo "✅ Build successful!"
         echo "📦 JAR file created: target/hiring-challenge-1.0.0.jar"
-        echo "⬇️  Download from the Actions tab in GitHub"
+        echo "⬇️  Download from the Actions tab or Releases"
