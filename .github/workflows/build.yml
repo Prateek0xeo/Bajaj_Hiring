@@ -9,6 +9,10 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,9 +38,9 @@ jobs:
         path: target/hiring-challenge-1.0.0.jar
         retention-days: 7
     
-    - name: Create Release
+    - name: Create or Update Release
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: latest
         name: Latest Build
@@ -61,6 +65,8 @@ jobs:
           - Maven
         files: target/hiring-challenge-1.0.0.jar
         token: ${{ secrets.GITHUB_TOKEN }}
+        make_latest: true
+        prerelease: false
     
     - name: Display build success
       run: |
